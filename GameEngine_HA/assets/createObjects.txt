@@ -1,0 +1,19 @@
+basic meshName friendlyName position(x,y,z) rotation(x,y,z) scale
+advanced meshName friendlyName bUse_RGBA_colour(1/0) RGBA_Colour(vec4) isWireFrame(1/0) scale bDoNotLight(1/0)
+basic HelmsDeep HelmsDeep 0 -100 0 0 0 0 0.5
+basic Ground Ground 0 -100 0 -90 0 0 0.5
+basic Warrior Warrior 0 0 0 0 0 0 1
+basic Tree Tree1 0 -100 0 0 0 0 5
+basic Tree Tree2 0 -100 0 0 0 0 5
+basic Tree Tree3 0 -100 0 0 0 0 5
+basic Tree Tree4 0 -100 0 0 0 0 5
+basic Tree Tree5 0 -100 0 0 0 0 5
+basic Tree Tree6 0 -100 0 0 0 0 5
+basic Tree Tree7 0 -100 0 0 0 0 5
+basic Tree Tree8 0 -100 0 0 0 0 5
+basic SmallArch SmallArch1 0 0 0 0 0 0 1
+basic SmallArch SmallArch2 0 0 0 0 0 0 1
+basic CaveRock CaveRock1 0 0 0 0 0 0 1
+basic CaveRock CaveRock2 0 0 0 0 0 0 1
+basic CaveRock2 CaveRock3 0 0 0 0 0 0 1
+basic CaveRock2 CaveRock4 0 0 0 0 0 0 1
