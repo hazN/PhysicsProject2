@@ -27,6 +27,7 @@ public:
 	void Integrate(float dt);
 	void ApplyForce(const glm::vec3& direction);
 	void KillAllForces();
+	void SetForce(const glm::vec3& direction);
 
 	inline const glm::vec3& GetPosition() const { return position; }
 	inline const glm::vec3& GetVelocity() const { return velocity; }

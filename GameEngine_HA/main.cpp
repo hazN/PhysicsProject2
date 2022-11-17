@@ -405,40 +405,6 @@ int main(int argc, char* argv[])
 	pDebugSphere_5->bDoNotLight = true;
 	g_pMeshObjects.push_back(pDebugSphere_5);
 
-	//// Character sphere
-	//Sphere* otherSphere = new Sphere(g_pMeshObjects[2]->position, g_pMeshObjects[2]->scale);
-	//m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[2]->position, otherSphere);
-	//m_PhysicsSystem.m_PhysicsObjects[0]->m_IsStatic = false;
-	//std::vector<glm::vec3> vertices;
-	//std::vector<int> triangles;
-	//sModelDrawInfo draw_info;
-	//// Helms deep
-	//pVAOManager->FindDrawInfoByModelName("HelmsDeep", draw_info);
-	//for (int i = 0; i < draw_info.numberOfVertices; i++)
-	//{
-	//	vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
-	//}
-	//// Create our mesh inside the physics system
-	//for (int i = 0; i < draw_info.numberOfTriangles; i += 3) {
-	//	int indexA = i;
-	//	int indexB = i + 1;
-	//	int indexC = i + 2;
-
-	//	// HACK to save time from fixing the vertices returned from the GDP Graphics library
-	//	if (indexA + 2 >= vertices.size()) {
-	//		printf("Skipping creating a triangle!\n");
-	//		continue;
-	//	}
-
-	//	glm::vec3 vertexA = glm::vec3(vertices[indexA]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-	//	glm::vec3 vertexB = glm::vec3(vertices[indexB]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-	//	glm::vec3 vertexC = glm::vec3(vertices[indexC]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-
-	//	Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
-	//	PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[0]->position, triangle);
-	//	trianglePhysObj->SetMass(-1.f);
-	//}
-
 	GLint mvp_location = glGetUniformLocation(shaderID, "MVP");       // program
 	// uniform mat4 mModel;
 	// uniform mat4 mView;
@@ -457,20 +423,25 @@ int main(int argc, char* argv[])
 //        ::g_pTheLightManager->vecTheLights[0].position.x += 0.05f;
 
 		::g_pTheLightManager->CopyLightInformationToShader(shaderID);
-		g_cameraEye = g_pMeshObjects[2]->position + glm::vec3(0, 15, -25);
+		g_cameraEye = g_pMeshObjects[2]->position + glm::vec3(0, 15, 25);
 		g_cameraTarget = g_pMeshObjects[2]->position + glm::vec3(0, 0, 0);
-
 		if (Loaded)
 		{
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->Integrate(2.f);
+			}
+			//m_PhysicsSystem.playerObjects[0]->Integrate(5.f);
 			// Make sphere position = position of character model
-			m_PhysicsSystem.m_PhysicsObjects[0]->position = g_pMeshObjects[2]->position;
+			g_pMeshObjects[2]->position = m_PhysicsSystem.playerObjects[0]->position;
+			//m_PhysicsSystem.m_PhysicsObjects[0]->position = g_pMeshObjects[2]->position;
 			iShape* shapeA, * shapeB;
 
 			bool collision;
 			Loaded = true;
 
 			duration = (std::clock() - deltaTime) / (double)CLOCKS_PER_SEC;
-			if (duration > 0.5f)
+			if (duration > 0)
 			{
 				deltaTime = std::clock();
 				// Detect collisions
@@ -479,67 +450,111 @@ int main(int argc, char* argv[])
 				iShape* shapeA, * shapeB;
 
 				bool collision;
+				m_PhysicsSystem.UpdateStep(0);
+				//for (int i = 0; i < m_PhysicsSystem.playerObjects.size(); i++)
+				//{
+				//	physObjA = m_PhysicsSystem.playerObjects[i];
+				//	shapeA = physObjA->pShape;
 
-				physObjA = m_PhysicsSystem.m_PhysicsObjects[0];
-				shapeA = physObjA->pShape;
+				//	for (int j = 0; j < m_PhysicsSystem.m_PhysicsObjects.size(); j++) {
+				//		physObjB = m_PhysicsSystem.m_PhysicsObjects[j];
+				//		shapeB = physObjB->pShape;
+				//		Triangle* shape = (Triangle*)shapeB;
+				//		glm::vec3 avgPos = (shape->A + shape->B + shape->C) / 3.f;
+				//		/*
+				//		if (glm::length(avgPos - physObjA->position) < 10.f)
+				//		{
+				//			std::cout << "we got close!" << std::endl;
+				//		}*/
+				//		collision = m_PhysicsSystem.CollisionTest(physObjA->position, shapeA, physObjB->position, shapeB);
 
-				for (int j = 1; j < m_PhysicsSystem.m_PhysicsObjects.size(); j++) {
-					physObjB = m_PhysicsSystem.m_PhysicsObjects[j];
-					shapeB = physObjB->pShape;
-					Triangle* shape = (Triangle*)shapeB;
-					glm::vec3 avgPos = (shape->A + shape->B + shape->C) / 3.f;
-					if (glm::length(avgPos - physObjA->position) < 10.f)
-					{
-						std::cout << "we got close!" << std::endl;
-					}
-					collision = m_PhysicsSystem.CollisionTest(physObjA->position, shapeA, g_pMeshObjects[0]->position, shapeB);
+				//		if (collision) {
+				//			std::cout << shape->GetOwner() << " collision!" << std::endl;
+				//			/*	glm::vec3 direction = glm::normalize(physObjA->position - avgPos);
+				//				g_pMeshObjects[2]->position += direction;*/
+				//			if (physObjA->m_IsStatic == false)
+				//			{
+				//				physObjA->position = physObjA->prevPosition + glm::vec3(0.1f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
+				//				physObjA->SetForce(glm::normalize(avgPos - physObjA->position));
+				//				//physObjA->KillAllForces();
+				//				physObjA->velocity = glm::vec3(0);
 
-					if (collision) {
-						if (physObjA->m_IsStatic == false)
-						{
-							physObjA->position.y = physObjA->prevPosition.y;
-							////physObjA->KillAllForces();
-							physObjA->velocity.y = 0.0f;
+				//				cMeshObject* colSpot;
+				//				colSpot = new cMeshObject();
+				//				colSpot->meshName = "ISO_Sphere_1";
+				//				colSpot->friendlyName = std::to_string(avgPos.x + avgPos.y + avgPos.z);
+				//				colSpot->bUse_RGBA_colour = true;
+				//				colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
+				//				colSpot->isWireframe = true;
+				//				colSpot->scale = 1.0f;
+				//				colSpot->bDoNotLight = true;
+				//				colSpot->position = avgPos;
+				//				g_pMeshObjects.push_back(colSpot);
 
-							// Bounce:
-							//physObjA->velocity = Vector3(0.0f) - physObjA->velocity * 0.8f;
-						}
 
-						if (physObjB->m_IsStatic == false)
-						{
-							physObjB->position.y = physObjB->prevPosition.y;
-							//physObjB->KillAllForces();
-							physObjB->velocity.y = 0.0f;
-
-							//physObjB->velocity = Vector3(0.0f) - physObjB->velocity * 0.8f;
-						}
-					}
-				}
+				//				// Bounce:
+				//				//physObjA->velocity = Vector3(0.0f) - physObjA->velocity * 0.8f;
+				//			}
+				//		}
+				//	}
+				//}
 			}
+			//if (duration > 0)
+			//{
+			//	deltaTime = std::clock();
+			//	// Detect collisions
+			//	PhysicsObject* physObjA, * physObjB;
+
+			//	iShape* shapeA, * shapeB;
+
+			//	bool collision;
+
+			//	physObjA = m_PhysicsSystem.m_PhysicsObjects[0];
+			//	shapeA = physObjA->pShape;
+
+			//	for (int j = 1; j < m_PhysicsSystem.m_PhysicsObjects.size(); j++) {
+			//		physObjB = m_PhysicsSystem.m_PhysicsObjects[j];
+			//		shapeB = physObjB->pShape;
+			//		Triangle* shape = (Triangle*)shapeB;
+			//		glm::vec3 avgPos = (shape->A + shape->B + shape->C) / 3.f;
+			//		/*
+			//		if (glm::length(avgPos - physObjA->position) < 10.f)
+			//		{
+			//			std::cout << "we got close!" << std::endl;
+			//		}*/
+			//		collision = m_PhysicsSystem.CollisionTest(physObjA->position, shapeA, physObjB->position, shapeB);
+
+			//		if (collision) {
+			//				std::cout << shape->GetOwner() << " collision!" << std::endl;
+			//		/*	glm::vec3 direction = glm::normalize(physObjA->position - avgPos);
+			//			g_pMeshObjects[2]->position += direction;*/
+			//			if (physObjA->m_IsStatic == false)
+			//			{
+			//				physObjA->position = physObjA->prevPosition + glm::vec3(0.1f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
+			//				physObjA->SetForce(glm::normalize(avgPos - physObjA->position));
+			//				//physObjA->KillAllForces();
+			//				physObjA->velocity = glm::vec3(0);
+
+			//				cMeshObject* colSpot;
+			//				colSpot = new cMeshObject();
+			//				colSpot->meshName = "ISO_Sphere_1";
+			//				colSpot->friendlyName = std::to_string(avgPos.x + avgPos.y + avgPos.z);
+			//				colSpot->bUse_RGBA_colour = true;
+			//				colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
+			//				colSpot->isWireframe = true;
+			//				colSpot->scale = 1.0f;
+			//				colSpot->bDoNotLight = true;
+			//				colSpot->position = avgPos;
+			//				g_pMeshObjects.push_back(colSpot);
+			//			
+
+			//				// Bounce:
+			//				//physObjA->velocity = Vector3(0.0f) - physObjA->velocity * 0.8f;
+			//			}
+			//		}
+			//	}
+			//}
 		}
-		//for (glm::vec3* terrain_vertex : terrainVertices)
-		//{
-		   // if (glm::length(g_pMeshObjects[2]->position - *terrain_vertex) < 2.f)
-		   // {
-		//        glm::vec3 direction = glm::normalize(g_pMeshObjects[2]->position - *terrain_vertex);
-		//        g_pMeshObjects[2]->position -= direction * 5.f;
-		   // }
-		//}
-		//        glUniform4f(light_0_position_UL,
-		//                    lightPosition.x,
-		//                    lightPosition.y,
-		//                    lightPosition.z,
-		//                    1.0f);
-
-				// Point the spotlight at the submarine
-	   /* glm::vec3 LightToSubRay =
-			pTree->position - glm::vec3(::g_pTheLightManager->vecTheLights[0].position);*/
-
-			// Normalizing is also just divide by the length of the ray
-	//        LightToSubRay /= glm::length(LightToSubRay);
-			//LightToSubRay = glm::normalize(LightToSubRay);
-
-			//        ::g_pTheLightManager->vecTheLights[0].direction = glm::vec4(LightToSubRay, 1.0f);
 
 		DrawConcentricDebugLightObjects();
 

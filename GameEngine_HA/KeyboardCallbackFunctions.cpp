@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include <glm/ext/matrix_transform.hpp>
 // Extern is so the compiler knows what TYPE this thing is
 // The LINKER needs the ACTUAL declaration
 // These are defined in theMainFunction.cpp
@@ -157,41 +157,77 @@ void key_callback(GLFWwindow* window,
 					}
 				}
 				*/
-				// Character sphere
-				Sphere* otherSphere = new Sphere(g_pMeshObjects[2]->position, g_pMeshObjects[2]->scale);
-				m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[2]->position, otherSphere);
-				m_PhysicsSystem.m_PhysicsObjects[0]->m_IsStatic = false;
-				std::vector<glm::vec3> vertices;
-				std::vector<int> triangles;
-				sModelDrawInfo draw_info;
-				// Helms deep
-				pVAOManager->FindDrawInfoByModelName("HelmsDeep", draw_info);
-				for (int i = 0; i < draw_info.numberOfVertices; i++)
-				{
-					vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
-				}
-				// Create our mesh inside the physics system
-				for (int i = 0; i < draw_info.numberOfTriangles; i += 3) {
-					int indexA = i;
-					int indexB = i + 1;
-					int indexC = i + 2;
-
-					// HACK to save time from fixing the vertices returned from the GDP Graphics library
-					if (indexA + 2 >= vertices.size()) {
-						printf("Skipping creating a triangle!\n");
-						continue;
-					}
-
-					glm::vec3 vertexA = glm::vec3(vertices[indexA]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-					glm::vec3 vertexB = glm::vec3(vertices[indexB]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-					glm::vec3 vertexC = glm::vec3(vertices[indexC]) * g_pMeshObjects[0]->scale + g_pMeshObjects[0]->position;
-
-					Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
-					PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[0]->position, triangle);
-					trianglePhysObj->SetMass(-1.f);
-				}
-				Loaded = true;
 			}
+			// Character sphere
+		/*	Sphere* otherSphere = new Sphere(glm::vec3(0), g_pMeshObjects[2]->scale);
+			otherSphere->Radius = 1;
+			m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[2]->position, otherSphere);
+			m_PhysicsSystem.m_PhysicsObjects[0]->m_IsStatic = false;*/
+			float scale = g_pMeshObjects[2]->scale;
+			glm::vec3 position = g_pMeshObjects[2]->position;
+			std::vector<glm::vec3> vertices;
+			std::vector<int> triangles;
+
+			sModelDrawInfo draw_info;
+			// Helms deep
+			pVAOManager->FindDrawInfoByModelName("Warrior", draw_info);
+			for (int i = 0; i < draw_info.numberOfVertices; i++)
+			{
+				vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
+			}
+			// Create our mesh inside the physics system
+			for (int i = 0; i < draw_info.numberOfTriangles; i++) {
+
+				glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale);//+ position;
+				glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale);//+ position;
+				glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale);//+ position;
+
+				Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+				triangle->Owner = "Warrior";
+				//PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
+
+				PhysicsObject* physicsObject = new PhysicsObject(glm::vec3(0));
+				physicsObject->pShape = triangle;
+				physicsObject->m_IsStatic = false;
+				m_PhysicsSystem.playerObjects.push_back(physicsObject);
+				//trianglePhysObj->SetMass(-1.f);
+			}
+			for (cMeshObject* obj : g_pMeshObjects)
+			{
+				if (obj->meshName == "Warrior" || obj->meshName == "ISO_Sphere_1" || obj->meshName == "ISO_Sphere_2")
+				{
+					continue;
+				}
+				if (obj->meshName != "Ground")
+				{
+					continue;
+				}
+				pVAOManager->createPhysicsObject(obj->meshName, obj->position, obj->scale);
+
+				// Create our mesh inside the physics system
+				//for (int i = 0; i < draw_info.numberOfTriangles; i += 3) {
+				//	int indexA = i;
+				//	int indexB = i + 1;
+				//	int indexC = i + 2;
+
+				//	// HACK to save time from fixing the vertices returned from the GDP Graphics library
+				//	if (indexA + 2 >= vertices.size()) {
+				//		printf("Skipping creating a triangle!\n");
+				//		continue;
+				//	}
+				//	glm::vec3 position = obj->position;
+				//	float scale = obj->scale;
+				//	glm::vec3 vertexA = glm::vec3(vertices[indexA]) * scale + position;
+				//	glm::vec3 vertexB = glm::vec3(vertices[indexB]) * scale + position;
+				//	glm::vec3 vertexC = glm::vec3(vertices[indexC]) * scale + position;
+
+				//	Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+				//	triangle->Owner = obj->meshName;
+				//	PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(position, triangle);
+				//	trianglePhysObj->SetMass(-1.f);
+				//}
+			}
+			Loaded = true;
 		}
 	}
 	if (key == GLFW_KEY_C && action == GLFW_PRESS)
@@ -385,61 +421,91 @@ void key_callback(GLFWwindow* window,
 	break;
 	case MOVING_SELECTED_OBJECT:
 	{
-		if (mods == GLFW_MOD_SHIFT)
-		{
-			if (OBJECT_MOVE_SPEED == 0.1f)
+		/*	if (mods == GLFW_MOD_SHIFT)
 			{
-				OBJECT_MOVE_SPEED = 1.f;
-			}
-			else OBJECT_MOVE_SPEED = 0.1f;
-		}
+				if (OBJECT_MOVE_SPEED == 0.1f)
+				{
+					OBJECT_MOVE_SPEED = 1.f;
+				}
+				else OBJECT_MOVE_SPEED = 0.1f;
+			}*/
+		OBJECT_MOVE_SPEED = 0.0001;
 		if (key == GLFW_KEY_A)     // Left
 		{
-			::g_pMeshObjects[currentModel]->position.x += OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(-OBJECT_MOVE_SPEED, 0, 0));
+			}
+			//::g_pMeshObjects[currentModel]->position.x += OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_D)     // Right
 		{
-			::g_pMeshObjects[currentModel]->position.x -= OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(OBJECT_MOVE_SPEED, 0, 0));
+			}
+			//m_PhysicsSystem.m_PhysicsObjects[0]->ApplyForce(glm::vec3(OBJECT_MOVE_SPEED, 0, 0));
+			//::g_pMeshObjects[currentModel]->position.x -= OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_W)     // Forward
 		{
-			::g_pMeshObjects[currentModel]->position.z += OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(0, 0, -OBJECT_MOVE_SPEED));
+			}
+			//m_PhysicsSystem.m_PhysicsObjects[0]->ApplyForce(glm::vec3(0, 0, -OBJECT_MOVE_SPEED));
+			//::g_pMeshObjects[currentModel]->position.z += OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_S)     // Backwards
 		{
-			::g_pMeshObjects[currentModel]->position.z -= OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(0, 0, OBJECT_MOVE_SPEED));
+			}
+			//m_PhysicsSystem.m_PhysicsObjects[0]->ApplyForce(glm::vec3(0, 0, OBJECT_MOVE_SPEED));
+			//::g_pMeshObjects[currentModel]->position.z -= OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_Q)     // Down
 		{
-			::g_pMeshObjects[currentModel]->position.y -= OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(0, -OBJECT_MOVE_SPEED, 0));
+			}
+			//m_PhysicsSystem.m_PhysicsObjects[0]->ApplyForce(glm::vec3(0, -OBJECT_MOVE_SPEED, 0));
+			//::g_pMeshObjects[currentModel]->position.y -= OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_E)     // Up
 		{
-			::g_pMeshObjects[currentModel]->position.y += OBJECT_MOVE_SPEED;
+			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+			{
+				obj->ApplyForce(glm::vec3(0, OBJECT_MOVE_SPEED, 0));
+			}
+			//m_PhysicsSystem.m_PhysicsObjects[0]->ApplyForce(glm::vec3(0, OBJECT_MOVE_SPEED, 0));
+			//::g_pMeshObjects[currentModel]->position.y += OBJECT_MOVE_SPEED;
 		}
 		if (key == GLFW_KEY_Z)     // Rotate x
 		{
-			::g_pMeshObjects[currentModel]->rotation.x += OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.x += 0.5f;
 		}
 		if (key == GLFW_KEY_X)     // Rotate x
 		{
-			::g_pMeshObjects[currentModel]->rotation.x -= OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.x -= 0.5f;
 		}
 		if (key == GLFW_KEY_V)     // Rotate y
 		{
-			::g_pMeshObjects[currentModel]->rotation.y += OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.y += 0.5f;
 		}
 		if (key == GLFW_KEY_B)     // Rotate y
 		{
-			::g_pMeshObjects[currentModel]->rotation.y -= OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.y -= 0.5f;
 		}
 		if (key == GLFW_KEY_F)     // Rotate z
 		{
-			::g_pMeshObjects[currentModel]->rotation.z += OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.z += 0.5f;
 		}
 		if (key == GLFW_KEY_G)     // Rotate z
 		{
-			::g_pMeshObjects[currentModel]->rotation.z -= OBJECT_MOVE_SPEED;
+			::g_pMeshObjects[2]->rotation.z -= 0.5f;
 		}
 		if (key == GLFW_KEY_EQUAL)     // Size UP
 		{

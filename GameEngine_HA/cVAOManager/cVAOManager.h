@@ -38,6 +38,7 @@ public:
 
 	std::string getLastError(bool bAndClear = true);
 	void LoadStaticModelToOurAABBEnvironment(const std::string& filepath, const glm::vec3& position, float scale);
+	void createPhysicsObject(std::string meshName, glm::vec3 position, float scale);
 private:
 
 	std::map< std::string /*model name*/,

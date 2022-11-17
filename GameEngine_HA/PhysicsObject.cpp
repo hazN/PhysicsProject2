@@ -1,5 +1,6 @@
 ﻿#include "PhysicsObject.h"
 #include <iostream>
+#include <glm/geometric.hpp>
 
 //#define PRINT_DEBUG_INFO
 
@@ -79,24 +80,48 @@ void PhysicsObject::Integrate(float dt) {
 	// 0 or negative mass object will be a "static" object.
 	if (invMass <= 0 || m_IsStatic)
 		return;
-
-
+	if (force != glm::vec3(0))
+	{
+		glm::normalize(force);
+	}
 	acceleration = force * invMass;
 	velocity += acceleration * dt;
-
+	velocity *= damping;
 	prevPosition = position;
 	position += velocity * dt;
 
-	//velocity *= damping;
 }
 
 void PhysicsObject::ApplyForce(const glm::vec3& direction) {
 	if (invMass <= 0 || m_IsStatic)
 		return;
-
 	force += direction;
 }
 
 void PhysicsObject::KillAllForces() {
 	force = glm::vec3(0.f, 0.f, 0.f);
+}
+
+void PhysicsObject::SetForce(const glm::vec3& direction) {
+	if (direction.x >= direction.y)
+	{
+		if (direction.x >= direction.z)
+		{
+			force.x = 0.f;
+		}
+	}
+	if (direction.y >= direction.x)
+	{
+		if (direction.y >= direction.z)
+		{
+			force.y = 0.f;
+		}
+	}
+	if (direction.z >= direction.x)
+	{
+		if (direction.z >= direction.x)
+		{
+			force.z = 0.f;
+		}
+	}
 }

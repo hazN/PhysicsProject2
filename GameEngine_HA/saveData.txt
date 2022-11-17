@@ -1,6 +1,6 @@
-0 155.9 -390.201
+27 16 -209
 l
-0 1316.7 -418 1 1 1 1 1 1 1 1 1 0.1 0.00270481 3.49324e-07 1 0 -1 0 1 0 10 20 1 1 
+0 300 -1000 1 1 1 1 1 1 1 1 1 0.1 0.001 1e-07 1 0 -1 0 1 0 10 20 1 1 
 l
 0 10 0 1 1 0 0 1 1 0 0 1 0.1 1e-05 0.1 1 -1.07374e+08 -1.07374e+08 -1.07374e+08 -1.07374e+08 0 0 0 1 1 
 l
@@ -12,46 +12,46 @@ l
 l
 0 10 0 1 1 0 1 1 1 0 0 1 0.1 1e-05 0.1 1 -1.07374e+08 -1.07374e+08 -1.07374e+08 -1.07374e+08 0 0 0 1 1 
 o
-HelmsDeep HelmsDeep 0 -33 54 0 21 0 0.5 0 0 0 0 0 1 0 1
+HelmsDeep HelmsDeep 84 -66 128.6 0 0 0 0.6 0 0 0 0 0 1 0 1
 o
-Ground Ground -381.8 -20.2001 455 -89.8 0 0 3.4 0 0 0 0 0 1 0 1
+Ground Ground -110.4 -140 162 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Warrior Warrior 17 15 17 0 0 0 1 1 0 0 0 0 1 0 1
+Warrior Warrior 30 -100 100 0 0 0 1 1 0 0 0 0 1 0 1
 o
-Tree Tree1 90 -7 73 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree1 -8 -59 31 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree2 -79.5 -38 -19 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree2 -20 -63 16 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree3 132 -23 -38 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree3 -33 -64 4 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree4 53 -27 -43 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree4 -51 -70 84 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree5 -148 -39 -3 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree5 25 -59 50 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree6 0 -31 -69 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree6 45 -71 -41 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree7 0 14 163.5 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree7 0 -73 -59 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree8 50 5 129 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree8 15 -69 2 0 0 0 3 0 0 0 0 0 1 0 1
 o
-SmallArch SmallArch1 -26 -17.4001 -4.89998 -6 2.6 0 0.6 0 0 0 0 0 1 0 1
+SmallArch SmallArch1 -40 -52 -25 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-SmallArch SmallArch2 166 0 0 0 0 0 1 0 0 0 0 0 1 0 1
+SmallArch SmallArch2 27 -50 40 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock CaveRock1 -255.1 -34 89 -25 3.2 0 1 0 0 0 0 0 1 0 1
+CaveRock CaveRock1 24 -68 -15 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock CaveRock2 -108 24 186 0 4 0 1 0 0 0 0 0 1 0 1
+CaveRock CaveRock2 55 -66 20 0 0 0.5 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock2 CaveRock3 -180 -11 -37 0 0 0 1 0 0 0 0 0 1 0 1
+CaveRock2 CaveRock3 44 -45 -62 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock2 CaveRock4 -26 1 127 0 0 0 1 0 0 0 0 0 1 0 1
+CaveRock2 CaveRock4 -68 -48 38 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-ISO_Sphere_1 Debug_Sphere_1 0 1316.7 -418 0 0 0 1 1 1 1 1 1 1 1 1
+ISO_Sphere_1 Debug_Sphere_1 0 300 -1000 0 0 0 1 1 1 1 1 1 1 1 1
 o
-ISO_Sphere_1 Debug_Sphere_2 0 1316.7 -418 0 0 0 432.129 1 1 1 0 0 1 1 1
+ISO_Sphere_1 Debug_Sphere_2 0 300 -1000 0 0 0 1110.84 1 1 1 0 0 1 1 1
 o
-ISO_Sphere_1 Debug_Sphere_3 0 1316.7 -418 0 0 0 649.414 1 1 0 1 0 1 1 1
+ISO_Sphere_1 Debug_Sphere_3 0 300 -1000 0 0 0 1630.86 1 1 0 1 0 1 1 1
 o
-ISO_Sphere_1 Debug_Sphere_4 0 1316.7 -418 0 0 0 1240.23 1 1 0 1 1 1 1 1
+ISO_Sphere_1 Debug_Sphere_4 0 300 -1000 0 0 0 3007.81 1 1 0 1 1 1 1 1
 o
-ISO_Sphere_1 Debug_Sphere_5 0 1316.7 -418 0 0 0 4609.38 1 1 0 1 1 1 1 1
+ISO_Sphere_1 Debug_Sphere_5 0 300 -1000 0 0 0 9843.75 1 1 0 1 1 1 1 1

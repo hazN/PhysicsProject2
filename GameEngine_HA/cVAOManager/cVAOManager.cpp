@@ -361,3 +361,29 @@ void cVAOManager::LoadStaticModelToOurAABBEnvironment(const std::string& filepat
 			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashC, newTriangle);
 	}
 }
+
+void cVAOManager::createPhysicsObject(std::string meshName, glm::vec3 position, float scale)
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
+
+	sModelDrawInfo draw_info;
+	// Helms deep
+	pVAOManager->FindDrawInfoByModelName(meshName, draw_info);
+	for (int i = 0; i < draw_info.numberOfVertices; i++)
+	{
+		vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
+	}
+	// Create our mesh inside the physics system
+	for (int i = 0; i < draw_info.numberOfTriangles; i++) {
+
+		glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale) + position;
+		glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale) + position;
+		glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale) + position;
+
+		Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+		triangle->Owner = meshName;
+		PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
+		//trianglePhysObj->SetMass(-1.f);
+	}
+}

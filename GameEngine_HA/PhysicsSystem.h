@@ -19,7 +19,8 @@ public:
 		return m_AABBStructure;
 	}
 	std::vector<PhysicsObject*> m_PhysicsObjects;
-
+	std::vector<PhysicsObject*> playerObjects;
+	bool PointInTriangle(glm::vec3 triV1, glm::vec3 triV2, glm::vec3 triV3, glm::vec3 point);
 	bool CollisionTest(const glm::vec3& posA, iShape* shapeA, const glm::vec3& posB, iShape* shapeB);
 	bool CollisionTest(const glm::vec3& posA, Sphere* a, const glm::vec3& posB, Sphere* b);
 	bool CollisionTest(const glm::vec3& posA, Sphere* a, const glm::vec3& posB, AABB* b);
