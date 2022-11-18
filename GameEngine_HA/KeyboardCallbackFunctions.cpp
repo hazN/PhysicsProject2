@@ -198,7 +198,7 @@ void key_callback(GLFWwindow* window,
 				{
 					continue;
 				}
-				if (obj->meshName != "Ground")
+				if (obj->meshName != "Tree")
 				{
 					continue;
 				}

@@ -50,7 +50,6 @@ void PhysicsSystem::UpdateStep(float duration) {
 		glm::vec3 tri1V1 = triangle->A + physObjA->position;
 		glm::vec3 tri1V2 = triangle->B + physObjA->position;
 		glm::vec3 tri1V3 = triangle->C + physObjA->position;
-
 		// Find the normal
 		glm::vec3 U = glm::vec3(0);
 		glm::vec3 V = glm::vec3(0);
@@ -114,6 +113,10 @@ void PhysicsSystem::UpdateStep(float duration) {
 					planeIntersectZ = (t2V[k].z * t) + (t2V[k + 1].z * (1 - t));
 
 					pointInPlane = glm::vec3(planeIntersectX, planeIntersectY, planeIntersectZ);
+					if (glm::length(pointInPlane - tri1V1) < 1.f || glm::length(pointInPlane - tri1V2) < 1.f || glm::length(pointInPlane - tri1V3) < 1.f)
+					{
+						std::cout << " close " << std::endl;
+					}
 					count++;
 					if (count > 150000)
 					{
@@ -128,7 +131,8 @@ void PhysicsSystem::UpdateStep(float duration) {
 					{
 						if (physObjB->m_IsStatic == false)
 						{
-							physObjA->position = physObjA->prevPosition + glm::vec3(0.1f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
+							physObjA->KillAllForces();
+							physObjA->position = physObjA->prevPosition + glm::vec3(0.5f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
 							physObjA->SetForce(glm::normalize(triPoint - physObjA->position));
 							//physObjA->KillAllForces();
 							physObjA->velocity = glm::vec3(0);
@@ -142,38 +146,12 @@ void PhysicsSystem::UpdateStep(float duration) {
 							colSpot->isWireframe = true;
 							colSpot->scale = 1.0f;
 							colSpot->bDoNotLight = true;
-							colSpot->position = triPoint;
+							colSpot->position = pointInPlane;
 							g_pMeshObjects.push_back(colSpot);
 						}
 					}
 				}
-				//collision = CollisionTest(physObjA->position, shapeA, physObjB->position, shapeB);
-
-				//if (collision) {
-				//	if (physObjA->m_IsStatic == false)
-				//	{
-				//		physObjA->position.y = physObjA->prevPosition.y;
-				//		////physObjA->KillAllForces();
-				//		physObjA->velocity.y = 0.0f;
-
-				//		// Bounce:
-				//		//physObjA->velocity = glm::vec3(0.0f) - physObjA->velocity * 0.8f;
-				//	}
-
-				//	if (physObjB->m_IsStatic == false)
-				//	{
-				//		physObjB->position.y = physObjB->prevPosition.y;
-				//		//physObjB->KillAllForces();
-				//		physObjB->velocity.y = 0.0f;
-
-				//		//physObjB->velocity = glm::vec3(0.0f) - physObjB->velocity * 0.8f;
-				//	}
-				//}
 			}
-		}
-
-		for (int i = 0; i < numPhysicsObjects; i++) {
-			m_PhysicsObjects[i]->KillAllForces();
 		}
 	}
 }
@@ -251,6 +229,7 @@ bool PhysicsSystem::PointInTriangle(glm::vec3 triV1, glm::vec3  triV2, glm::vec3
 
 	//Compare the three smaller triangle areas with the main triangles area
 	//Subtract a small value from totalSmallTriArea to make up for inacuracy
+	// was 0.001f then swapped to 2.001f
 	if (mainTriArea >= (totalSmallTriArea - 0.001f))
 	{
 		return true;
