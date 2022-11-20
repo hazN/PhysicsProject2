@@ -19,6 +19,8 @@
 #include <sstream>  // "string builder" type thing
 
 // Some STL (Standard Template Library) things
+#include <functional>
+#include <thread>
 #include <vector>           // aka a "smart array"
 
 #include "globalThings.h"
@@ -31,7 +33,6 @@
 
 glm::vec3 g_cameraEye = glm::vec3(0.0, 25, -300.0f);
 glm::vec3 g_cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
 // Call back signatures here
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -47,6 +48,13 @@ float RandomFloat(float a, float b) {
 	float diff = b - a;
 	float r = random * diff;
 	return a + r;
+}
+
+void physicsUpdate(int min, int max)
+{
+	while (!endThread) {
+		m_PhysicsSystem.UpdateStep(min, max);
+	}
 }
 
 bool LoadModelTypesIntoVAO(std::string fileTypesToLoadName,
@@ -415,6 +423,7 @@ int main(int argc, char* argv[])
 	// Need this for lighting
 	GLint mModelInverseTransform_location = glGetUniformLocation(shaderID, "mModelInverseTranspose");
 
+	bool spawnedThreads = false;
 	float deltaTime = std::clock();
 	float duration = 0;
 	while (!glfwWindowShouldClose(window))
@@ -427,133 +436,45 @@ int main(int argc, char* argv[])
 		g_cameraTarget = g_pMeshObjects[2]->position + glm::vec3(0, 0, 0);
 		if (Loaded)
 		{
-			for (PhysicsObject* obj : m_PhysicsSystem.playerObjects)
+		
+			if (!spawnedThreads)
 			{
-				obj->Integrate(2.f);
+				spawnedThreads = true;
+
+		
+	/*			std::thread th2([&]() {
+					while (!endThread) {
+						m_PhysicsSystem.UpdateStep(quarter, half);
+					}
+					});
+				std::thread th3([&]() {
+					while (!endThread) {
+						m_PhysicsSystem.UpdateStep(half, half + quarter);
+					}
+					});
+				std::thread th4([&]() {
+					while (!endThread) {
+						m_PhysicsSystem.UpdateStep(half + quarter, playerObject->triangles.size());
+					}
+					});*/
 			}
 			//m_PhysicsSystem.playerObjects[0]->Integrate(5.f);
 			// Make sphere position = position of character model
-			g_pMeshObjects[2]->position = m_PhysicsSystem.playerObjects[0]->position;
+			g_pMeshObjects[2]->position = playerObject->position;
 			//m_PhysicsSystem.m_PhysicsObjects[0]->position = g_pMeshObjects[2]->position;
 			iShape* shapeA, * shapeB;
 
 			bool collision;
 			Loaded = true;
 
+			// Run physics updates
 			duration = (std::clock() - deltaTime) / (double)CLOCKS_PER_SEC;
 			if (duration > 0)
 			{
+				playerObject->Integrate(1.f);
 				deltaTime = std::clock();
 				// Detect collisions
-				PhysicsObject* physObjA, * physObjB;
-
-				iShape* shapeA, * shapeB;
-
-				bool collision;
-				m_PhysicsSystem.UpdateStep(0);
-				//for (int i = 0; i < m_PhysicsSystem.playerObjects.size(); i++)
-				//{
-				//	physObjA = m_PhysicsSystem.playerObjects[i];
-				//	shapeA = physObjA->pShape;
-
-				//	for (int j = 0; j < m_PhysicsSystem.m_PhysicsObjects.size(); j++) {
-				//		physObjB = m_PhysicsSystem.m_PhysicsObjects[j];
-				//		shapeB = physObjB->pShape;
-				//		Triangle* shape = (Triangle*)shapeB;
-				//		glm::vec3 avgPos = (shape->A + shape->B + shape->C) / 3.f;
-				//		/*
-				//		if (glm::length(avgPos - physObjA->position) < 10.f)
-				//		{
-				//			std::cout << "we got close!" << std::endl;
-				//		}*/
-				//		collision = m_PhysicsSystem.CollisionTest(physObjA->position, shapeA, physObjB->position, shapeB);
-
-				//		if (collision) {
-				//			std::cout << shape->GetOwner() << " collision!" << std::endl;
-				//			/*	glm::vec3 direction = glm::normalize(physObjA->position - avgPos);
-				//				g_pMeshObjects[2]->position += direction;*/
-				//			if (physObjA->m_IsStatic == false)
-				//			{
-				//				physObjA->position = physObjA->prevPosition + glm::vec3(0.1f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
-				//				physObjA->SetForce(glm::normalize(avgPos - physObjA->position));
-				//				//physObjA->KillAllForces();
-				//				physObjA->velocity = glm::vec3(0);
-
-				//				cMeshObject* colSpot;
-				//				colSpot = new cMeshObject();
-				//				colSpot->meshName = "ISO_Sphere_1";
-				//				colSpot->friendlyName = std::to_string(avgPos.x + avgPos.y + avgPos.z);
-				//				colSpot->bUse_RGBA_colour = true;
-				//				colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
-				//				colSpot->isWireframe = true;
-				//				colSpot->scale = 1.0f;
-				//				colSpot->bDoNotLight = true;
-				//				colSpot->position = avgPos;
-				//				g_pMeshObjects.push_back(colSpot);
-
-
-				//				// Bounce:
-				//				//physObjA->velocity = Vector3(0.0f) - physObjA->velocity * 0.8f;
-				//			}
-				//		}
-				//	}
-				//}
 			}
-			//if (duration > 0)
-			//{
-			//	deltaTime = std::clock();
-			//	// Detect collisions
-			//	PhysicsObject* physObjA, * physObjB;
-
-			//	iShape* shapeA, * shapeB;
-
-			//	bool collision;
-
-			//	physObjA = m_PhysicsSystem.m_PhysicsObjects[0];
-			//	shapeA = physObjA->pShape;
-
-			//	for (int j = 1; j < m_PhysicsSystem.m_PhysicsObjects.size(); j++) {
-			//		physObjB = m_PhysicsSystem.m_PhysicsObjects[j];
-			//		shapeB = physObjB->pShape;
-			//		Triangle* shape = (Triangle*)shapeB;
-			//		glm::vec3 avgPos = (shape->A + shape->B + shape->C) / 3.f;
-			//		/*
-			//		if (glm::length(avgPos - physObjA->position) < 10.f)
-			//		{
-			//			std::cout << "we got close!" << std::endl;
-			//		}*/
-			//		collision = m_PhysicsSystem.CollisionTest(physObjA->position, shapeA, physObjB->position, shapeB);
-
-			//		if (collision) {
-			//				std::cout << shape->GetOwner() << " collision!" << std::endl;
-			//		/*	glm::vec3 direction = glm::normalize(physObjA->position - avgPos);
-			//			g_pMeshObjects[2]->position += direction;*/
-			//			if (physObjA->m_IsStatic == false)
-			//			{
-			//				physObjA->position = physObjA->prevPosition + glm::vec3(0.1f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
-			//				physObjA->SetForce(glm::normalize(avgPos - physObjA->position));
-			//				//physObjA->KillAllForces();
-			//				physObjA->velocity = glm::vec3(0);
-
-			//				cMeshObject* colSpot;
-			//				colSpot = new cMeshObject();
-			//				colSpot->meshName = "ISO_Sphere_1";
-			//				colSpot->friendlyName = std::to_string(avgPos.x + avgPos.y + avgPos.z);
-			//				colSpot->bUse_RGBA_colour = true;
-			//				colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
-			//				colSpot->isWireframe = true;
-			//				colSpot->scale = 1.0f;
-			//				colSpot->bDoNotLight = true;
-			//				colSpot->position = avgPos;
-			//				g_pMeshObjects.push_back(colSpot);
-			//			
-
-			//				// Bounce:
-			//				//physObjA->velocity = Vector3(0.0f) - physObjA->velocity * 0.8f;
-			//			}
-			//		}
-			//	}
-			//}
 		}
 
 		DrawConcentricDebugLightObjects();
@@ -796,9 +717,9 @@ int main(int argc, char* argv[])
 	// Get rid of stuff
 	delete pTheShaderManager;
 	delete ::g_pTheLightManager;
+	endThread = true;
 
 	glfwDestroyWindow(window);
-
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
 }

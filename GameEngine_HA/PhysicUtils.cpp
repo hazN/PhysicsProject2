@@ -1,6 +1,5 @@
 ﻿#include "PhysicsUtils.h"
 
-
 int TestSphereSphere(const glm::vec3& posA, float radiusA, const glm::vec3& posB, float radiusB)
 {
 	// Calculate squared distance between centers
@@ -171,7 +170,6 @@ float getSmallTriArea(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 point)
 //https://www.braynzarsoft.net/viewtutorial/q16390-24-triangle-to-triangle-collision-detection
 int TestTriangleTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 a2, glm::vec3 b2, glm::vec3 c2, glm::vec3& p)
 {
-
 	// Find area of first triangle
 	{
 		// Edge 1
@@ -199,7 +197,7 @@ int TestTriangleTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 a2, gl
 
 		float Area1 = sqrt(s * (s - edgeLength1) * (s - edgeLength2) * (s - edgeLength3));
 
-		float totalSmallTriArea = getSmallTriArea(a,b,c,a2);
+		float totalSmallTriArea = getSmallTriArea(a, b, c, a2);
 
 		// Compare the three smaller triangles with the first triangles area
 		// Subtract a small value to make up for inaccuracy

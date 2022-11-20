@@ -14,7 +14,7 @@
 
 cMeshObject::cMeshObject()
 {
-	this->position = glm::vec3(0.0f);    
+	this->position = glm::vec3(0.0f);
 	this->rotation = glm::vec3(0.0f);
 	// RGB and "alpha" (A) 0.0f = transparent
 	this->scale = 1.0f;

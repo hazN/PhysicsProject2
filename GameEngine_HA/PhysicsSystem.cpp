@@ -26,30 +26,39 @@ PhysicsObject* PhysicsSystem::CreatePhysicsObject(const glm::vec3& position, iSh
 	m_PhysicsObjects.push_back(physicsObject);
 	return physicsObject;
 }
+
 int count = 0;
-void PhysicsSystem::UpdateStep(float duration) {
-	size_t numPlayerObjects = playerObjects.size();
-	size_t numPhysicsObjects = m_PhysicsObjects.size();
+float deltaTime = std::clock();
+float duration = 0;
+// Method : UpdateStep
+// Summary: Loops through the playerobject and takes hash to check for collisions
+// Params : int int
+// Returns: void
+// SOURCE : https://www.braynzarsoft.net/viewtutorial/q16390-24-triangle-to-triangle-collision-detection
+void PhysicsSystem::UpdateStep(int min, int max) {
+	size_t numPlayerObjects = playerObject->triangles.size();
+	//size_t numPhysicsObjects = m_PhysicsObjects.size();
 
-	if (numPhysicsObjects == 0 || numPlayerObjects == 0)
+	if (numPlayerObjects == 0)
 		return;
-
+	if (max == numPlayerObjects)
+	{
+		max--;
+	}
 	// Detect collisions
-	PhysicsObject* physObjA, * physObjB;
+	PhysicsObject* physObjA = playerObject;
 
 	iShape* shapeA, * shapeB;
 
 	bool collision;
 
-	// Got this from https://www.braynzarsoft.net/viewtutorial/q16390-24-triangle-to-triangle-collision-detection
-	for (int i = 0; i < numPlayerObjects - 1; i++) {
-		physObjA = playerObjects[i];
-		shapeA = physObjA->pShape;
+	for (int i = min; i < max; i++) {
+		shapeA = physObjA->triangles[i];
 		Triangle* triangle = (Triangle*)shapeA;
 
-		glm::vec3 tri1V1 = triangle->A + physObjA->position;
-		glm::vec3 tri1V2 = triangle->B + physObjA->position;
-		glm::vec3 tri1V3 = triangle->C + physObjA->position;
+		glm::vec3 tri1V1 = triangle->A + playerObject->position;
+		glm::vec3 tri1V2 = triangle->B + playerObject->position;
+		glm::vec3 tri1V3 = triangle->C + playerObject->position;
 		// Find the normal
 		glm::vec3 U = glm::vec3(0);
 		glm::vec3 V = glm::vec3(0);
@@ -71,52 +80,70 @@ void PhysicsSystem::UpdateStep(float duration) {
 		float pe3 = faceNormal.z;
 		float pe4 = (-pe1 * triPoint.x - pe2 * triPoint.y - pe3 * triPoint.z);
 
-		for (int j = 0; j < numPhysicsObjects; j++) {
-			physObjB = m_PhysicsObjects[j];
-			shapeB = physObjB->pShape;
-			Triangle* triangle2 = (Triangle*)shapeB;
+		int hashA = pVAOManager->CalculateHashValue(tri1V1);
+		int hashB = pVAOManager->CalculateHashValue(tri1V2);
+		int hashC = pVAOManager->CalculateHashValue(tri1V3);
+		if (AABBloop(hashA, pe1, pe2, pe3, pe4, tri1V1, tri1V2, tri1V3, physObjA, triPoint))
+			return;
+		if (AABBloop(hashB, pe1, pe2, pe3, pe4, tri1V1, tri1V2, tri1V3, physObjA, triPoint))
+			return;
+		if (AABBloop(hashC, pe1, pe2, pe3, pe4, tri1V1, tri1V2, tri1V3, physObjA, triPoint))
+			return;
+	}
+}
+// Method : AABBloop
+// Summary: Loops through AABBstructure at given hash value
+// Params : int, float, float, float, float, float, vec3, vec3, vec3, PhysicsObject*, vec3
+// Returns: bool
+// SOURCE : https://www.braynzarsoft.net/viewtutorial/q16390-24-triangle-to-triangle-collision-detection
+bool PhysicsSystem::AABBloop(int hash, float pe1, float pe2, float pe3, float pe4, glm::vec3 tri1V1, glm::vec3 tri1V2, glm::vec3 tri1V3, PhysicsObject* physObjA, glm::vec3 triPoint)
+{
+	for (int j = 0; j < m_AABBStructure[hash].size(); j++) {
+		//PhysicsObject* physObjB;
+		Triangle* shapeB = m_AABBStructure[hash].at(j);
+		//shapeB = physObjB->pShape;
+		Triangle* triangle2 = (Triangle*)shapeB;
 
-			glm::vec3 tri2V1 = triangle2->A;//+ physObjB->position;
-			glm::vec3 tri2V2 = triangle2->B;//+ physObjB->position;
-			glm::vec3 tri2V3 = triangle2->C;//+ physObjB->position;
+		glm::vec3 tri2V1 = triangle2->A;//+ physObjB->position;
+		glm::vec3 tri2V2 = triangle2->B;//+ physObjB->position;
+		glm::vec3 tri2V3 = triangle2->C;//+ physObjB->position;
 
-			float ep1, ep2, t = 0.0f;
-			float planeIntersectX, planeIntersectY, planeIntersectZ = 0.0f;
-			glm::vec3 pointInPlane = glm::vec3(0);
+		float ep1, ep2, t = 0.0f;
+		float planeIntersectX, planeIntersectY, planeIntersectZ = 0.0f;
+		glm::vec3 pointInPlane = glm::vec3(0);
 
-			glm::vec3 t2V[4];
-			t2V[0] = tri2V1;
-			t2V[1] = tri2V2;
-			t2V[2] = tri2V3;
-			t2V[3] = tri2V1;
+		glm::vec3 t2V[4];
+		t2V[0] = tri2V1;
+		t2V[1] = tri2V2;
+		t2V[2] = tri2V3;
+		t2V[3] = tri2V1;
 
-			for (int k = 0; k < 3; k++)
+		for (int k = 0; k < 3; k++)
+		{
+			// Calculate where on the line
+			// edge (eg. tri2V1, tri2V2), intersects with the plane
+			ep1 = (pe1 * t2V[k].x) + (pe2 * t2V[k].y) + (pe3 * t2V[k].z);
+			ep2 = (pe1 * t2V[k + 1].x) + (pe2 * t2V[k + 1].y) + (pe3 * t2V[k + 1].z);
+
+			//Set t to -1 in case there is a divide-by-zero
+			t = -1;
+
+			//Make sure there are no divide-by-zeros
+			if (ep1 != ep2)
+				t = -(ep2 + pe4) / (ep1 - ep2);
+
+			//If the lines intersection with the triangles plane was between the
+			//two vertices (tri2V1, tri2V2), calculate the point of intersection
+			if (t >= 0.0f && t <= 1.0f)
 			{
-				//Calculate where on the line, created from this trangles
-				//edge (eg. tri2V1, tri2V2), intersects with the plane
-				ep1 = (pe1 * t2V[k].x) + (pe2 * t2V[k].y) + (pe3 * t2V[k].z);
-				ep2 = (pe1 * t2V[k + 1].x) + (pe2 * t2V[k + 1].y) + (pe3 * t2V[k + 1].z);
+				planeIntersectX = (t2V[k].x * t) + (t2V[k + 1].x * (1 - t));
+				planeIntersectY = (t2V[k].y * t) + (t2V[k + 1].y * (1 - t));
+				planeIntersectZ = (t2V[k].z * t) + (t2V[k + 1].z * (1 - t));
 
-				//Set t to -1 in case there is a divide-by-zero
-				t = -1;
-
-				//Make sure there are no divide-by-zeros
-				if (ep1 != ep2)
-					t = -(ep2 + pe4) / (ep1 - ep2);
-
-				//If the lines intersection with the triangles plane was between the
-				//two vertices (tri2V1, tri2V2), calculate the point of intersection
-				if (t >= 0.0f && t <= 1.0f)
+				pointInPlane = glm::vec3(planeIntersectX, planeIntersectY, planeIntersectZ);
+				/*if (glm::length(pointInPlane - tri1V1) < 0.5f || glm::length(pointInPlane - tri1V2) < 0.5f || glm::length(pointInPlane - tri1V3) < 0.5f)
 				{
-					planeIntersectX = (t2V[k].x * t) + (t2V[k + 1].x * (1 - t));
-					planeIntersectY = (t2V[k].y * t) + (t2V[k + 1].y * (1 - t));
-					planeIntersectZ = (t2V[k].z * t) + (t2V[k + 1].z * (1 - t));
-
-					pointInPlane = glm::vec3(planeIntersectX, planeIntersectY, planeIntersectZ);
-					if (glm::length(pointInPlane - tri1V1) < 1.f || glm::length(pointInPlane - tri1V2) < 1.f || glm::length(pointInPlane - tri1V3) < 1.f)
-					{
-						std::cout << " close " << std::endl;
-					}
+					//std::cout << " close " << std::endl;/*
 					count++;
 					if (count > 150000)
 					{
@@ -125,81 +152,86 @@ void PhysicsSystem::UpdateStep(float duration) {
 						std::cout << " tri1v2 = " << tri1V2.x << " " << tri1V2.y << " " << tri1V2.z;
 						std::cout << " tri1v3 = " << tri1V3.x << " " << tri1V3.y << " " << tri1V3.z
 							<< "\npointInPlane = " << pointInPlane.x << " " << pointInPlane.y << " " << pointInPlane.z << std::endl;
-					}
+					}*/
 					//Call function to check if point is in the triangle
-					if (PointInTriangle(tri1V1, tri1V2, tri1V3, pointInPlane))
-					{
-						if (physObjB->m_IsStatic == false)
-						{
-							physObjA->KillAllForces();
-							physObjA->position = physObjA->prevPosition + glm::vec3(0.5f);// +glm::normalize(physObjA->position - avgPos) * 2.f;
-							physObjA->SetForce(glm::normalize(triPoint - physObjA->position));
-							//physObjA->KillAllForces();
-							physObjA->velocity = glm::vec3(0);
+				if (PointInTriangle(tri1V1, tri1V2, tri1V3, pointInPlane))
+				{
+					/*physObjA->KillAllForces();
+					physObjA->velocity = glm::vec3(0);
+					physObjA->acceleration = glm::vec3(0);*/
+					playerObject->KillAllForces();
+					playerObject->position += (glm::normalize(playerObject->prevPosition - pointInPlane));// / 2.f);// *2.f;
+					playerObject->SetForce(playerObject->force - glm::normalize(pointInPlane - physObjA->position));
+					//physObjA->position = physObjA->prevPosition +glm::normalize(physObjA->position - pointInPlane) * 2.f;
+					//physObjA->SetForce(glm::normalize(triPoint - physObjA->position));
 
-							cMeshObject* colSpot;
-							colSpot = new cMeshObject();
-							colSpot->meshName = "ISO_Sphere_1";
-							colSpot->friendlyName = std::to_string(triPoint.x + triPoint.y + triPoint.z);
-							colSpot->bUse_RGBA_colour = true;
-							colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
-							colSpot->isWireframe = true;
-							colSpot->scale = 1.0f;
-							colSpot->bDoNotLight = true;
-							colSpot->position = pointInPlane;
-							g_pMeshObjects.push_back(colSpot);
-						}
+					duration = (std::clock() - deltaTime) / (double)CLOCKS_PER_SEC;
+					if (duration > 0.5f)
+					{
+						deltaTime = std::clock();
+						cMeshObject* colSpot;
+						colSpot = new cMeshObject();
+						colSpot->meshName = "ISO_Sphere_1";
+						colSpot->friendlyName = std::to_string(triPoint.x + triPoint.y + triPoint.z + rand() % 200);
+						colSpot->bUse_RGBA_colour = true;
+						colSpot->RGBA_colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.f);
+						colSpot->isWireframe = true;
+						colSpot->scale = 1.0f;
+						colSpot->bDoNotLight = true;
+						colSpot->position = pointInPlane;
+						g_pMeshObjects.push_back(colSpot);
 					}
+					return true;
 				}
+				//}
 			}
 		}
 	}
+	return false;
 }
-
+// Method : PointInTriangle
+// Summary: Finds if a given point is inside given triangle by utilizing the area of the triangle
+// Params : vec3, vec3, vec3, vec3
+// Returns: bool
+// SOURCE : https://www.braynzarsoft.net/viewtutorial/q16390-24-triangle-to-triangle-collision-detection
 bool PhysicsSystem::PointInTriangle(glm::vec3 triV1, glm::vec3  triV2, glm::vec3  triV3, glm::vec3  point)
 {
-	//To find out if the point is inside the triangle, we will first find the area
-	//of the entire triangle. After we find the area of the entire triangle, we will
-	//use the point as a vertex, and create 3 more triangles using the three vertices
-	//which make up the first triangle. We will find the area of the three triangles we
-	//make using the point, then add the three triangle areas together. If the area
-	//of the three triangles added up is the same as the first triangles area, the point
-	//is inside the triangle. If the area of the three triangles added up is greater than
-	//the area of the first triangle, the point is outside the triangle.
-
-	//Find area of first triangle
+	// Edge 1
 	float distX = triV1.x - triV2.x;
 	float distY = triV1.y - triV2.y;
 	float distZ = triV1.z - triV2.z;
 
 	float edgeLength1 = sqrt(distX * distX + distY * distY + distZ * distZ);
 
+	// Edge 2
 	distX = triV1.x - triV3.x;
 	distY = triV1.y - triV3.y;
 	distZ = triV1.z - triV3.z;
 
 	float edgeLength2 = sqrt(distX * distX + distY * distY + distZ * distZ);
 
+	// Edge 3
 	distX = triV2.x - triV3.x;
 	distY = triV2.y - triV3.y;
 	distZ = triV2.z - triV3.z;
 
 	float edgeLength3 = sqrt(distX * distX + distY * distY + distZ * distZ);
 
+	// Get area of the triangle
 	float s = (edgeLength1 + edgeLength2 + edgeLength3) / 2.0f;
 
 	float mainTriArea = sqrt(s * (s - edgeLength1) * (s - edgeLength2) * (s - edgeLength3));
 
-	//Find areas of the three triangles created with the point
+	// Find areas of the 3 triangles created with the pointInPlane
 
 	float smallTriArea[3] = { 0.0f, 0.0f, 0.0f };
 	glm::vec3  triVert[4];
 	triVert[0] = triV1;
 	triVert[1] = triV2;
 	triVert[2] = triV3;
-	triVert[3] = triV1; //When i=2, i+1 will be triV1
+	triVert[3] = triV1; 
 
-	//Find 3 triangle areas using the plane intersecting point
+	// Find area of the 3 triangles using the pointInPlane
 	for (int i = 0; i < 3; i++)
 	{
 		distX = point.x - triVert[i].x;
@@ -227,14 +259,12 @@ bool PhysicsSystem::PointInTriangle(glm::vec3 triV1, glm::vec3  triV2, glm::vec3
 
 	float totalSmallTriArea = smallTriArea[0] + smallTriArea[1] + smallTriArea[2];
 
-	//Compare the three smaller triangle areas with the main triangles area
-	//Subtract a small value from totalSmallTriArea to make up for inacuracy
-	// was 0.001f then swapped to 2.001f
+	// Check if the area of the smaller triangles are larger than the original triangle(aka collides)
 	if (mainTriArea >= (totalSmallTriArea - 0.001f))
 	{
 		return true;
 	}
-
+	// No Collision
 	return false;
 }
 

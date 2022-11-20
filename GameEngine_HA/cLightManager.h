@@ -10,7 +10,7 @@ public:
 	cLightManager();
 
 	static const unsigned int NUMBER_OF_LIGHTS_IM_GONNA_USE = 6;
-//	static const unsigned int NUMBER_OF_LIGHTS_IM_GONNA_USE = 10;
+	//	static const unsigned int NUMBER_OF_LIGHTS_IM_GONNA_USE = 10;
 	std::vector<cLight> vecTheLights;
 
 	void LoadLightUniformLocations(unsigned int shaderID);
@@ -19,5 +19,4 @@ public:
 
 	// Or we could use a simple array
 	//	cLight theLights[NUMBER_OF_LIGHTS_IM_GONNA_USE];
-
 };

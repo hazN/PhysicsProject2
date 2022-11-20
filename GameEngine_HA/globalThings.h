@@ -16,7 +16,9 @@ extern cVAOManager* pVAOManager;
 extern std::map<int, cMeshObject*> g_PartialMeshObjects;
 extern std::map<int, cMeshObject*>::iterator g_PartialMeshObjectsCursor;
 extern PhysicsSystem m_PhysicsSystem;
-extern bool Loaded; 
+extern PhysicsObject* playerObject;
+extern bool endThread;
+extern bool Loaded;
 extern int currentLight;
 extern int currentModel;
 #endif

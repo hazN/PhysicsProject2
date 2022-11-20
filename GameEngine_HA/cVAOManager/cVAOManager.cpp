@@ -37,7 +37,7 @@ sModelDrawInfo::sModelDrawInfo()
 void sModelDrawInfo::CalculateExtents(void)
 {
 	// Do we even have an array?
-	if ( this->pVertices )		// same as != NULL
+	if (this->pVertices)		// same as != NULL
 	{
 		// Assume that the 1st vertex is both the min and max
 		this->minX = this->maxX = this->pVertices[0].x;
@@ -47,12 +47,12 @@ void sModelDrawInfo::CalculateExtents(void)
 		for (unsigned int index = 0; index != this->numberOfVertices; index++)
 		{
 			// See if "this" vertex is smaller than the min
-			if (this->pVertices[index].x < this->minX) { this->minX = this->pVertices[index].x;	}
+			if (this->pVertices[index].x < this->minX) { this->minX = this->pVertices[index].x; }
 			if (this->pVertices[index].y < this->minY) { this->minY = this->pVertices[index].y; }
 			if (this->pVertices[index].z < this->minZ) { this->minZ = this->pVertices[index].z; }
 
 			// See if "this" vertex is larger than the max
-			if (this->pVertices[index].x > this->maxX) { this->maxX = this->pVertices[index].x;	}
+			if (this->pVertices[index].x > this->maxX) { this->maxX = this->pVertices[index].x; }
 			if (this->pVertices[index].y > this->maxY) { this->maxY = this->pVertices[index].y; }
 			if (this->pVertices[index].z > this->maxZ) { this->maxZ = this->pVertices[index].z; }
 		}//for (unsigned int index = 0...
@@ -71,16 +71,14 @@ void sModelDrawInfo::CalculateExtents(void)
 	return;
 }
 
-
-
 bool cVAOManager::LoadModelIntoVAO(
-		std::string fileName, 
-		sModelDrawInfo &drawInfo,
-	    unsigned int shaderProgramID)
+	std::string fileName,
+	sModelDrawInfo& drawInfo,
+	unsigned int shaderProgramID)
 
 {
 	// Load the model from file
-	// (We do this here, since if we can't load it, there's 
+	// (We do this here, since if we can't load it, there's
 	//	no point in doing anything else, right?)
 
 	drawInfo.meshName = fileName;
@@ -88,142 +86,133 @@ bool cVAOManager::LoadModelIntoVAO(
 	// Calculate the extents of this model
 	drawInfo.CalculateExtents();
 
-
 	// TODO: Load the model from file
 
-	// 
+	//
 	// Model is loaded and the vertices and indices are in the drawInfo struct
-	// 
+	//
 
-	// Create a VAO (Vertex Array Object), which will 
-	//	keep track of all the 'state' needed to draw 
+	// Create a VAO (Vertex Array Object), which will
+	//	keep track of all the 'state' needed to draw
 	//	from this buffer...
 
 	// Ask OpenGL for a new buffer ID...
-	glGenVertexArrays( 1, &(drawInfo.VAO_ID) );
+	glGenVertexArrays(1, &(drawInfo.VAO_ID));
 	// "Bind" this buffer:
 	// - aka "make this the 'current' VAO buffer
 	glBindVertexArray(drawInfo.VAO_ID);
 
 	// Now ANY state that is related to vertex or index buffer
-	//	and vertex attribute layout, is stored in the 'state' 
-	//	of the VAO... 
-
+	//	and vertex attribute layout, is stored in the 'state'
+	//	of the VAO...
 
 	// NOTE: OpenGL error checks have been omitted for brevity
 //	glGenBuffers(1, &vertex_buffer);
-	glGenBuffers(1, &(drawInfo.VertexBufferID) );
+	glGenBuffers(1, &(drawInfo.VertexBufferID));
 
-//	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	//	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, drawInfo.VertexBufferID);
 	// sVert vertices[3]
-	glBufferData( GL_ARRAY_BUFFER, 
-				  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones) * drawInfo.numberOfVertices,	// ::g_NumberOfVertsToDraw,	// sizeof(vertices), 
-				  (GLvoid*) drawInfo.pVertices,							// pVertices,			//vertices, 
-				  GL_STATIC_DRAW );
-
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones) * drawInfo.numberOfVertices,	// ::g_NumberOfVertsToDraw,	// sizeof(vertices),
+		(GLvoid*)drawInfo.pVertices,							// pVertices,			//vertices,
+		GL_STATIC_DRAW);
 
 	// Copy the index buffer into the video card, too
 	// Create an index buffer.
-	glGenBuffers( 1, &(drawInfo.IndexBufferID) );
+	glGenBuffers(1, &(drawInfo.IndexBufferID));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawInfo.IndexBufferID);
 
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER,			// Type: Index element array
-	              sizeof( unsigned int ) * drawInfo.numberOfIndices, 
-	              (GLvoid*) drawInfo.pIndices,
-                  GL_STATIC_DRAW );
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,			// Type: Index element array
+		sizeof(unsigned int) * drawInfo.numberOfIndices,
+		(GLvoid*)drawInfo.pIndices,
+		GL_STATIC_DRAW);
 
+	//   __     __        _              _                            _
+	//   \ \   / /__ _ __| |_ _____  __ | |    __ _ _   _  ___  _   _| |_
+	//    \ \ / / _ \ '__| __/ _ \ \/ / | |   / _` | | | |/ _ \| | | | __|
+	//     \ V /  __/ |  | ||  __/>  <  | |__| (_| | |_| | (_) | |_| | |_
+	//      \_/ \___|_|   \__\___/_/\_\ |_____\__,_|\__, |\___/ \__,_|\__|
+	//                                              |___/
 
-//   __     __        _              _                            _   
-//   \ \   / /__ _ __| |_ _____  __ | |    __ _ _   _  ___  _   _| |_ 
-//    \ \ / / _ \ '__| __/ _ \ \/ / | |   / _` | | | |/ _ \| | | | __|
-//     \ V /  __/ |  | ||  __/>  <  | |__| (_| | |_| | (_) | |_| | |_ 
-//      \_/ \___|_|   \__\___/_/\_\ |_____\__,_|\__, |\___/ \__,_|\__|
-//                                              |___/                 
+		// in vec4 vColour;
+	GLint vColour_location = glGetAttribLocation(shaderProgramID, "vColour");
+	glEnableVertexAttribArray(vColour_location);
+	glVertexAttribPointer(vColour_location,
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, r));		// Offset the member variable
 
-	// in vec4 vColour;
-	GLint vColour_location = glGetAttribLocation(shaderProgramID, "vColour");	
-	glEnableVertexAttribArray(vColour_location);	
-	glVertexAttribPointer(vColour_location, 
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, r) );		// Offset the member variable
-
-	//in vec4 vPosition;			
+//in vec4 vPosition;
 	GLint vPosition_location = glGetAttribLocation(shaderProgramID, "vPosition");
 	glEnableVertexAttribArray(vPosition_location);
 	glVertexAttribPointer(vPosition_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, x) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, x));		// Offset the member variable
 
-	//in vec4 vNormal;			
+//in vec4 vNormal;
 	GLint vNormal_location = glGetAttribLocation(shaderProgramID, "vNormal");
 	glEnableVertexAttribArray(vNormal_location);
 	glVertexAttribPointer(vNormal_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, nx) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, nx));		// Offset the member variable
 
-	//in vec4 vUVx2;			
+//in vec4 vUVx2;
 	GLint vUVx2_location = glGetAttribLocation(shaderProgramID, "vUVx2");
 	glEnableVertexAttribArray(vUVx2_location);
 	glVertexAttribPointer(vUVx2_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, u0) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, u0));		// Offset the member variable
 
-	//in vec4 vTangent;			
+//in vec4 vTangent;
 	GLint vTangent_location = glGetAttribLocation(shaderProgramID, "vTangent");
 	glEnableVertexAttribArray(vTangent_location);
 	glVertexAttribPointer(vTangent_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, tx) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, tx));		// Offset the member variable
 
-	//in vec4 vBiNormal;		
+//in vec4 vBiNormal;
 	GLint vBiNormal_location = glGetAttribLocation(shaderProgramID, "vBiNormal");
 	glEnableVertexAttribArray(vBiNormal_location);
 	glVertexAttribPointer(vBiNormal_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, bx) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, bx));		// Offset the member variable
 
-	//in vec4 vBoneID;			
+//in vec4 vBoneID;
 	GLint vBoneID_location = glGetAttribLocation(shaderProgramID, "vBoneID");
 	glEnableVertexAttribArray(vBoneID_location);
 	glVertexAttribPointer(vBoneID_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, vBoneID[0]) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, vBoneID[0]));		// Offset the member variable
 
-	//in vec4 vBoneWeight;		
+//in vec4 vBoneWeight;
 	GLint vBoneWeight_location = glGetAttribLocation(shaderProgramID, "vBoneWeight");
 	glEnableVertexAttribArray(vBoneWeight_location);
 	glVertexAttribPointer(vBoneWeight_location,
-						  4, GL_FLOAT, 
-						  GL_FALSE,
-						  sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
-						  ( void* ) offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, vBoneWeight[0]) );		// Offset the member variable
+		4, GL_FLOAT,
+		GL_FALSE,
+		sizeof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones),						// Stride	(number of bytes)
+		(void*)offsetof(sVertex_RGBA_XYZ_N_UV_T_BiN_Bones, vBoneWeight[0]));		// Offset the member variable
 
-
-
-
-	// Now that all the parts are set up, set the VAO to zero
+// Now that all the parts are set up, set the VAO to zero
 	glBindVertexArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
 
 	glDisableVertexAttribArray(vColour_location);
 	glDisableVertexAttribArray(vPosition_location);
@@ -235,24 +224,22 @@ bool cVAOManager::LoadModelIntoVAO(
 	glDisableVertexAttribArray(vBoneWeight_location);
 
 	// Store the draw information into the map
-	this->m_map_ModelName_to_VAOID[ drawInfo.meshName ] = drawInfo;
-
+	this->m_map_ModelName_to_VAOID[drawInfo.meshName] = drawInfo;
 
 	return true;
 }
 
-
 // We don't want to return an int, likely
 bool cVAOManager::FindDrawInfoByModelName(
-		std::string filename,
-		sModelDrawInfo &drawInfo) 
+	std::string filename,
+	sModelDrawInfo& drawInfo)
 {
 	std::map< std::string /*model name*/,
-			sModelDrawInfo /* info needed to draw*/ >::iterator 
-		itDrawInfo = this->m_map_ModelName_to_VAOID.find( filename );
+		sModelDrawInfo /* info needed to draw*/ >::iterator
+		itDrawInfo = this->m_map_ModelName_to_VAOID.find(filename);
 
-	// Find it? 
-	if ( itDrawInfo == this->m_map_ModelName_to_VAOID.end() )
+	// Find it?
+	if (itDrawInfo == this->m_map_ModelName_to_VAOID.end())
 	{
 		// Nope
 		return false;
@@ -264,17 +251,17 @@ bool cVAOManager::FindDrawInfoByModelName(
 	return true;
 }
 
-int CalculateHashValue(float x, float y, float z)
+int cVAOManager::CalculateHashValue(float x, float y, float z)
 {
 	int hashValue = 0;
 
-	hashValue += floor(x + 128) / 100 * 10000;
-	hashValue += floor(y + 128) / 100 * 100;
+	hashValue += floor(x + 128) / 100 * 10000000;
+	hashValue += floor(y + 128) / 100 * 10000;
 	hashValue += floor(z + 128) / 100;
 	return hashValue;
 }
 
-int CalculateHashValue(const glm::vec3& v)
+int cVAOManager::CalculateHashValue(const glm::vec3& v)
 {
 	return CalculateHashValue(v.x, v.y, v.z);
 }
@@ -290,7 +277,6 @@ void cVAOManager::LoadStaticModelToOurAABBEnvironment(const std::string& filepat
 	sModelDrawInfo draw_info;
 	if (pVAOManager->FindDrawInfoByModelName(filepath, draw_info))
 	{
-
 	}
 	printf("Done loading large model!\n");
 	draw_info.minX = FLT_MAX;
@@ -332,7 +318,7 @@ void cVAOManager::LoadStaticModelToOurAABBEnvironment(const std::string& filepat
 	}
 	for (int i = 0; i < draw_info.numberOfTriangles; i += 3)
 	{
-		if (i+2 >= draw_info.numberOfVertices)
+		if (i + 2 >= draw_info.numberOfVertices)
 		{
 			continue;
 		}
@@ -362,6 +348,10 @@ void cVAOManager::LoadStaticModelToOurAABBEnvironment(const std::string& filepat
 	}
 }
 
+// Method : createPhysicsObject
+// Summary: Creates all the triangles and populates the hash map for given mesh
+// Params : String, vec3, float
+// Returns: void
 void cVAOManager::createPhysicsObject(std::string meshName, glm::vec3 position, float scale)
 {
 	std::vector<glm::vec3> vertices;
@@ -376,14 +366,56 @@ void cVAOManager::createPhysicsObject(std::string meshName, glm::vec3 position, 
 	}
 	// Create our mesh inside the physics system
 	for (int i = 0; i < draw_info.numberOfTriangles; i++) {
+		glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale + position);
+		glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale + position);
+		glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale + position);
 
-		glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale) + position;
-		glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale) + position;
-		glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale) + position;
+		int hashA = CalculateHashValue(vertexA);
+		int hashB = CalculateHashValue(vertexB);
+		int hashC = CalculateHashValue(vertexC);
 
 		Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
 		triangle->Owner = meshName;
-		PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
+		m_PhysicsSystem.m_AABBStructure[hashA].push_back(triangle);
+		if (hashA != hashB)
+			m_PhysicsSystem.m_AABBStructure[hashB].push_back(triangle);
+		if (hashA != hashB && hashC != hashA)
+			m_PhysicsSystem.m_AABBStructure[hashC].push_back(triangle);
+		int hash = 0;
+		glm::vec3 vertex;
+		vertex = vertexA;
+		glm::vec3 direction = glm::normalize(vertexB - vertexA);
+		glm::vec3 velocity;
+		bool add = false;
+		velocity = glm::vec3(0);
+		while (glm::length(vertexB - vertex) > 1.f)
+		{
+			vertex = vertex + direction * 2.f;
+			hash = CalculateHashValue(vertex);
+			if (hash != hashA && hash != hashB && hash != hashC)
+				m_PhysicsSystem.m_AABBStructure[hash].push_back(triangle);
+		}
+		vertex = vertexA;
+		direction = glm::normalize(vertexC - vertexA);
+		velocity = glm::vec3(0);
+		while (glm::length(vertexC - vertex) > 1.f)
+		{
+			vertex = vertex + direction * 2.f;
+			hash = CalculateHashValue(vertex);
+			if (hash != hashA && hash != hashB && hash != hashC)
+				m_PhysicsSystem.m_AABBStructure[hash].push_back(triangle);
+		}
+		vertex = vertexB;
+		direction = glm::normalize(vertexC - vertexB);
+		velocity = glm::vec3(0);
+		while (glm::length(vertexC - vertex) > 1.f)
+		{
+			vertex = vertex + direction * 2.f;
+			hash = CalculateHashValue(vertex);
+			if (hash != hashA && hash != hashB && hash != hashC)
+				m_PhysicsSystem.m_AABBStructure[hash].push_back(triangle);
+		}
+		//PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
 		//trianglePhysObj->SetMass(-1.f);
 	}
 }

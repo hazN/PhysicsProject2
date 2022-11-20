@@ -40,16 +40,16 @@ struct sModelDrawInfo
 
 	void CalculateExtents(void);
 
-	// You could store the max and min values of the 
+	// You could store the max and min values of the
 	//  vertices here (determined when you load them):
 	float maxX, maxY, maxZ;
 	float minX, minY, minZ;
-	// These are the lengths of the bounding box that holds the model, 
-	//	so extentX = maxX - minX, etc. 
+	// These are the lengths of the bounding box that holds the model,
+	//	so extentX = maxX - minX, etc.
 	float extentX, extentY, extentZ;
 
-//  scale = 1.5/maxExtent --> 1.5 x 1.5 x 1.5
-//	scale = 5.0/maxExtent --> 5 x 5 x 5
+	//  scale = 1.5/maxExtent --> 1.5 x 1.5 x 1.5
+	//	scale = 5.0/maxExtent --> 5 x 5 x 5
 	float maxExtent;
 
 	// The "local" (i.e. "CPU side" temporary array)

@@ -12,35 +12,35 @@ l
 l
 0 10 0 1 1 0 1 1 1 0 0 1 0.1 1e-05 0.1 1 -1.07374e+08 -1.07374e+08 -1.07374e+08 -1.07374e+08 0 0 0 1 1 
 o
-HelmsDeep HelmsDeep 84 -66 128.6 0 0 0 0.6 0 0 0 0 0 1 0 1
+HelmsDeep HelmsDeep 84 -76 128.6 0 0 0 0.3 0 0 0 0 0 1 0 1
 o
-Ground Ground -110.4 -140 162 0 0 0 3 0 0 0 0 0 1 0 1
+Ground Ground -110.4 -160 162 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Warrior Warrior 30 -100 100 0 0 0 1 1 0 0 0 0 1 0 1
+Warrior Warrior 30 -140 200 0 0 0 1 1 0 0 0 0 1 0 1
 o
-Tree Tree1 -8 -59 31 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree1 -28 -59 31 0 0 0 3 0 0 0 0 0 1 0 1
 o
 Tree Tree2 -20 -63 16 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree3 -33 -64 4 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree3 100 -64 4 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree4 -51 -70 84 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree4 150 -70 84 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree5 25 -59 50 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree5 125 -59 50 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Tree Tree6 45 -71 -41 0 0 0 3 0 0 0 0 0 1 0 1
+Tree Tree6 -45 -71 -41 0 0 0 3 0 0 0 0 0 1 0 1
 o
 Tree Tree7 0 -73 -59 0 0 0 3 0 0 0 0 0 1 0 1
 o
 Tree Tree8 15 -69 2 0 0 0 3 0 0 0 0 0 1 0 1
 o
-SmallArch SmallArch1 -40 -52 -25 0 0 0 0.5 0 0 0 0 0 1 0 1
+SmallArch SmallArch1 -40 -52 -125 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-SmallArch SmallArch2 27 -50 40 0 0 0 0.5 0 0 0 0 0 1 0 1
+SmallArch SmallArch2 27 -50 140 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock CaveRock1 24 -68 -15 0 0 0 0.5 0 0 0 0 0 1 0 1
+CaveRock CaveRock1 24 -68 -150 0 0 0 0.5 0 0 0 0 0 1 0 1
 o
-CaveRock CaveRock2 55 -66 20 0 0 0.5 0.5 0 0 0 0 0 1 0 1
+CaveRock CaveRock2 55 -66 200 0 0 0.5 0.5 0 0 0 0 0 1 0 1
 o
 CaveRock2 CaveRock3 44 -45 -62 0 0 0 0.5 0 0 0 0 0 1 0 1
 o

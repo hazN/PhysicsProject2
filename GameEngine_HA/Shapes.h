@@ -59,7 +59,6 @@ public:
 	float Min[3];
 	float Max[3];
 	std::string Owner;
-
 };
 
 class Triangle : public iShape {

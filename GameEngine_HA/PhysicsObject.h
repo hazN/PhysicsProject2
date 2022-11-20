@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <vector>
+
 #include "BoundingBox.h"
 #include "Shapes.h"
 
@@ -7,14 +9,14 @@ class PhysicsObject {
 	// Private area
 public:
 	PhysicsObject();
-	PhysicsObject(const glm::vec3 &position);
+	PhysicsObject(const glm::vec3& position);
 	~PhysicsObject();
-	PhysicsObject(const PhysicsObject &particle);
-	PhysicsObject operator=(const PhysicsObject &particle);
+	PhysicsObject(const PhysicsObject& particle);
+	PhysicsObject operator=(const PhysicsObject& particle);
 
 	void SetMass(float mass) {
-		// If the mass is 0 or less we treat it as 
-		// a static 
+		// If the mass is 0 or less we treat it as
+		// a static
 		if (mass <= 0) {
 			m_IsStatic = true;
 			invMass = -1.f;
@@ -32,6 +34,7 @@ public:
 	inline const glm::vec3& GetPosition() const { return position; }
 	inline const glm::vec3& GetVelocity() const { return velocity; }
 	inline const glm::vec3& GetAcceleration() const { return acceleration; }
+	std::vector<Triangle*> triangles;
 
 	BoundingBox* pBoundingBox;
 	iShape* pShape;
@@ -50,5 +53,4 @@ public:
 	float invMass;
 
 	void PrintInfo();
-
 };

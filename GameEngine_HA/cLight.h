@@ -28,7 +28,6 @@ public:
 	int param1_UniformLocation = -1;
 	int param2_UniformLocation = -1;
 
-
 	void setConstantAttenuation(float newConstAtten);
 	void setLinearAttenuation(float newLinearAtten);
 	void setQuadraticAttenuation(float newQuadAtten);
