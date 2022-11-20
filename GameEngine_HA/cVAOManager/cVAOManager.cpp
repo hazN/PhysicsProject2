@@ -2,13 +2,16 @@
 
 #include "cVAOManager.h"
 
+#include <iostream>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
 #include "../globalThings.h"
 #include <vector>
 #include <sstream>
-
+#include <fstream>
+extern glm::vec3 g_cameraEye;// = glm::vec3(0.0, 0.0, -25.0f);
+extern glm::vec3 g_cameraTarget;// = glm::vec3(0.0f, 0.0f, 0.0f);
 sModelDrawInfo::sModelDrawInfo()
 {
 	this->VAO_ID = 0;
@@ -417,5 +420,57 @@ void cVAOManager::createPhysicsObject(std::string meshName, glm::vec3 position, 
 		}
 		//PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
 		//trianglePhysObj->SetMass(-1.f);
+	}
+}
+
+void cVAOManager::Load()
+{
+	int lightIndex = 0;
+	int modelIndex = 0;
+	std::ifstream saveFile("saveData.txt");
+	if (!saveFile.is_open())
+	{
+		std::cout << "Load failed..." << std::endl;
+	}
+	else {
+		std::string line;
+		std::istringstream cam(line);
+		std::getline(saveFile, line);
+		cam >> g_cameraEye.x >> g_cameraEye.y >> g_cameraEye.z;
+		while (std::getline(saveFile, line))
+		{
+			std::istringstream in(line);
+			std::string type;
+			in >> type;
+			if (type == "l")
+			{
+				if (lightIndex < g_pTheLightManager->vecTheLights.size())
+				{
+					std::getline(saveFile, line);
+					std::istringstream in2(line);
+					in2 >> g_pTheLightManager->vecTheLights[lightIndex].position.x >> g_pTheLightManager->vecTheLights[lightIndex].position.y >> g_pTheLightManager->vecTheLights[lightIndex].position.z >> g_pTheLightManager->vecTheLights[lightIndex].position.w
+						>> g_pTheLightManager->vecTheLights[lightIndex].diffuse.x >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.y >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.z >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.w
+						>> g_pTheLightManager->vecTheLights[lightIndex].specular.x >> g_pTheLightManager->vecTheLights[lightIndex].specular.y >> g_pTheLightManager->vecTheLights[lightIndex].specular.z >> g_pTheLightManager->vecTheLights[lightIndex].specular.w
+						>> g_pTheLightManager->vecTheLights[lightIndex].atten.x >> g_pTheLightManager->vecTheLights[lightIndex].atten.y >> g_pTheLightManager->vecTheLights[lightIndex].atten.z >> g_pTheLightManager->vecTheLights[lightIndex].atten.w
+						>> g_pTheLightManager->vecTheLights[lightIndex].direction.x >> g_pTheLightManager->vecTheLights[lightIndex].direction.y >> g_pTheLightManager->vecTheLights[lightIndex].direction.z >> g_pTheLightManager->vecTheLights[lightIndex].direction.w
+						>> g_pTheLightManager->vecTheLights[lightIndex].param1.x >> g_pTheLightManager->vecTheLights[lightIndex].param1.y >> g_pTheLightManager->vecTheLights[lightIndex].param1.z >> g_pTheLightManager->vecTheLights[lightIndex].param1.w >> g_pTheLightManager->vecTheLights[lightIndex].param2.x;
+					lightIndex++;
+				}
+			}
+			else if (type == "o")
+			{
+				if (modelIndex < g_pMeshObjects.size())
+				{
+					std::getline(saveFile, line);
+					std::istringstream in2(line);
+					in2 >> g_pMeshObjects[modelIndex]->meshName >> g_pMeshObjects[modelIndex]->friendlyName >> g_pMeshObjects[modelIndex]->position.x >> g_pMeshObjects[modelIndex]->position.y >> g_pMeshObjects[modelIndex]->position.z
+						>> g_pMeshObjects[modelIndex]->rotation.x >> g_pMeshObjects[modelIndex]->rotation.y >> g_pMeshObjects[modelIndex]->rotation.z >> g_pMeshObjects[modelIndex]->scale >> g_pMeshObjects[modelIndex]->isWireframe
+						>> g_pMeshObjects[modelIndex]->bUse_RGBA_colour >> g_pMeshObjects[modelIndex]->RGBA_colour.x >> g_pMeshObjects[modelIndex]->RGBA_colour.y >> g_pMeshObjects[modelIndex]->RGBA_colour.z >> g_pMeshObjects[modelIndex]->RGBA_colour.w
+						>> g_pMeshObjects[modelIndex]->bDoNotLight >> g_pMeshObjects[modelIndex]->bIsVisible;
+					modelIndex++;
+				}
+			}
+		}
+		std::cout << "Load successful!" << std::endl;
 	}
 }

@@ -2,6 +2,7 @@
 #include "PhysicsUtils.h"
 #include <DirectXMath.h>
 #include <iostream>
+#include <thread>
 #include <glm/geometric.hpp>
 
 #include "cMeshObject.h"
@@ -25,6 +26,58 @@ PhysicsObject* PhysicsSystem::CreatePhysicsObject(const glm::vec3& position, iSh
 	physicsObject->pShape = shape;
 	m_PhysicsObjects.push_back(physicsObject);
 	return physicsObject;
+}
+
+// Method : Initialize
+// Summary: Initializes the physics system
+// Params : void
+// Returns: void
+void PhysicsSystem::Initialize()
+{
+	float scale = g_pMeshObjects[2]->scale;
+	glm::vec3 position = g_pMeshObjects[2]->position;
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
+
+	sModelDrawInfo draw_info;
+	// Load the player object
+	pVAOManager->FindDrawInfoByModelName("Warrior", draw_info);
+	playerObject = new PhysicsObject;
+	playerObject->m_IsStatic = false;
+	for (int i = 0; i < draw_info.numberOfVertices; i++)
+	{
+		vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
+	}
+	// Create our mesh inside the physics system
+	for (int i = 0; i < draw_info.numberOfTriangles; i++) {
+		glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale);//+ position;
+		glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale);//+ position;
+		glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale);//+ position;
+
+		Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+		triangle->Owner = "Warrior";
+		//PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
+		playerObject->triangles.push_back(triangle);
+		//trianglePhysObj->SetMass(-1.f);
+	}
+
+	for (cMeshObject* obj : g_pMeshObjects)
+	{
+		if (obj->meshName == "Warrior" || obj->meshName == "ISO_Sphere_1" || obj->meshName == "ISO_Sphere_2")
+		{
+			continue;
+		}
+		pVAOManager->createPhysicsObject(obj->meshName, obj->position, obj->scale);
+	}
+	int quarter = (int)(playerObject->triangles.size() / 2) / 2;
+	int half = (int)(playerObject->triangles.size() / 2);
+	std::thread th([&]() {
+		while (!endThread) {
+			m_PhysicsSystem.UpdateStep(0, playerObject->triangles.size());
+		}
+		});
+	th.detach();
+	Loaded = true;
 }
 
 int count = 0;

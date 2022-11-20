@@ -17,30 +17,16 @@ enum eEditMode
 {
 	MOVING_CAMERA,
 	MOVING_LIGHT,
-	MOVING_SELECTED_OBJECT  // For later, maybe??
+	MOVING_SELECTED_OBJECT  
 };
 
-eEditMode theEditMode = MOVING_CAMERA;
+eEditMode theEditMode = MOVING_SELECTED_OBJECT;
 
 bool bEnableDebugLightingObjects = true;
 float OBJECT_MOVE_SPEED = 0.1f;
 float CAMERA_MOVE_SPEED = 1.1f;
 float LIGHT_MOVE_SPEED = 0.1f;
-bool wireFrame = true;
-//0000 0001   1	GLFW_MOD_SHIFT
-//0000 0010 	  2
-//0000 0100   4
-//
-//0000 0110
-//0000 0001 	"Mask"
-//-------- -
-//0000 0000
-//
-//// I ONLY want the shift key and nothing else
-//if (mods == GLFW_MOD_SHIFT)
-//
-//// Shift key but I don't care if anything else is down, too
-//if ((mods & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT)
+bool wireFrame = false;
 
 void key_callback(GLFWwindow* window,
 	int key, int scancode,
@@ -82,132 +68,7 @@ void key_callback(GLFWwindow* window,
 	{
 		if (mods == GLFW_MOD_CONTROL)
 		{
-			int lightIndex = 0;
-			int modelIndex = 0;
-			std::ifstream saveFile("saveData.txt");
-			if (!saveFile.is_open())
-			{
-				std::cout << "Load failed..." << std::endl;
-			}
-			else {
-				std::string line;
-				std::istringstream cam(line);
-				std::getline(saveFile, line);
-				cam >> g_cameraEye.x >> g_cameraEye.y >> g_cameraEye.z;
-				while (std::getline(saveFile, line))
-				{
-					std::istringstream in(line);
-					std::string type;
-					in >> type;
-					if (type == "l")
-					{
-						if (lightIndex < g_pTheLightManager->vecTheLights.size())
-						{
-							std::getline(saveFile, line);
-							std::istringstream in2(line);
-							in2 >> g_pTheLightManager->vecTheLights[lightIndex].position.x >> g_pTheLightManager->vecTheLights[lightIndex].position.y >> g_pTheLightManager->vecTheLights[lightIndex].position.z >> g_pTheLightManager->vecTheLights[lightIndex].position.w
-								>> g_pTheLightManager->vecTheLights[lightIndex].diffuse.x >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.y >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.z >> g_pTheLightManager->vecTheLights[lightIndex].diffuse.w
-								>> g_pTheLightManager->vecTheLights[lightIndex].specular.x >> g_pTheLightManager->vecTheLights[lightIndex].specular.y >> g_pTheLightManager->vecTheLights[lightIndex].specular.z >> g_pTheLightManager->vecTheLights[lightIndex].specular.w
-								>> g_pTheLightManager->vecTheLights[lightIndex].atten.x >> g_pTheLightManager->vecTheLights[lightIndex].atten.y >> g_pTheLightManager->vecTheLights[lightIndex].atten.z >> g_pTheLightManager->vecTheLights[lightIndex].atten.w
-								>> g_pTheLightManager->vecTheLights[lightIndex].direction.x >> g_pTheLightManager->vecTheLights[lightIndex].direction.y >> g_pTheLightManager->vecTheLights[lightIndex].direction.z >> g_pTheLightManager->vecTheLights[lightIndex].direction.w
-								>> g_pTheLightManager->vecTheLights[lightIndex].param1.x >> g_pTheLightManager->vecTheLights[lightIndex].param1.y >> g_pTheLightManager->vecTheLights[lightIndex].param1.z >> g_pTheLightManager->vecTheLights[lightIndex].param1.w >> g_pTheLightManager->vecTheLights[lightIndex].param2.x;
-							lightIndex++;
-						}
-					}
-					else if (type == "o")
-					{
-						if (modelIndex < g_pMeshObjects.size())
-						{
-							std::getline(saveFile, line);
-							std::istringstream in2(line);
-							in2 >> g_pMeshObjects[modelIndex]->meshName >> g_pMeshObjects[modelIndex]->friendlyName >> g_pMeshObjects[modelIndex]->position.x >> g_pMeshObjects[modelIndex]->position.y >> g_pMeshObjects[modelIndex]->position.z
-								>> g_pMeshObjects[modelIndex]->rotation.x >> g_pMeshObjects[modelIndex]->rotation.y >> g_pMeshObjects[modelIndex]->rotation.z >> g_pMeshObjects[modelIndex]->scale >> g_pMeshObjects[modelIndex]->isWireframe
-								>> g_pMeshObjects[modelIndex]->bUse_RGBA_colour >> g_pMeshObjects[modelIndex]->RGBA_colour.x >> g_pMeshObjects[modelIndex]->RGBA_colour.y >> g_pMeshObjects[modelIndex]->RGBA_colour.z >> g_pMeshObjects[modelIndex]->RGBA_colour.w
-								>> g_pMeshObjects[modelIndex]->bDoNotLight >> g_pMeshObjects[modelIndex]->bIsVisible;
-							modelIndex++;
-						}
-					}
-				}
-				std::cout << "Load successful!" << std::endl;
-				//for (cMeshObject* g_p_mesh_object : g_pMeshObjects)
-				//{
-			/*		pVAOManager->LoadStaticModelToOurAABBEnvironment("assets/models/" + g_p_mesh_object->meshName + ".ply", g_p_mesh_object->position, g_p_mesh_object->scale);
-				}
-				pVAOManager->LoadStaticModelToOurAABBEnvironment("HelmsDeep", g_pMeshObjects[0]->position, g_pMeshObjects[0]->scale);
-				const std::map<int, std::vector<Triangle*>> aabb = m_PhysicsSystem.GetAABBStructure();
-				std::map<int, std::vector<Triangle*>>::const_iterator aabbIt = aabb.begin();
-
-				for (; aabbIt != aabb.end(); aabbIt++)
-				{
-					int hashValue = (*aabbIt).first;
-					std::vector<Triangle*> triangles = (*aabbIt).second;
-
-					std::vector<glm::vec3> vertices;
-					std::vector<int> faces;
-
-					for (int i = 0; i < triangles.size(); i++)
-					{
-						Triangle* triangle = triangles[i];
-						vertices.push_back(triangle->A);
-						vertices.push_back(triangle->B);
-						vertices.push_back(triangle->C);
-
-						faces.push_back(i * 3);
-						faces.push_back(i * 3 + 1);
-						faces.push_back(i * 3 + 2);
-					}
-				}
-				*/
-			}
-			// Character sphere
-		/*	Sphere* otherSphere = new Sphere(glm::vec3(0), g_pMeshObjects[2]->scale);
-			otherSphere->Radius = 1;
-			m_PhysicsSystem.CreatePhysicsObject(g_pMeshObjects[2]->position, otherSphere);
-			m_PhysicsSystem.m_PhysicsObjects[0]->m_IsStatic = false;*/
-			float scale = g_pMeshObjects[2]->scale;
-			glm::vec3 position = g_pMeshObjects[2]->position;
-			std::vector<glm::vec3> vertices;
-			std::vector<int> triangles;
-
-			sModelDrawInfo draw_info;
-			// Helms deep
-			pVAOManager->FindDrawInfoByModelName("Warrior", draw_info);
-			playerObject = new PhysicsObject;
-			playerObject->m_IsStatic = false;
-			for (int i = 0; i < draw_info.numberOfVertices; i++)
-			{
-				vertices.push_back(glm::vec3(draw_info.pVertices[i].x, draw_info.pVertices[i].y, draw_info.pVertices[i].z));
-			}
-			// Create our mesh inside the physics system
-			for (int i = 0; i < draw_info.numberOfTriangles; i++) {
-				glm::vec3 vertexA = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[0]]) * scale);//+ position;
-				glm::vec3 vertexB = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[1]]) * scale);//+ position;
-				glm::vec3 vertexC = (glm::vec3(vertices[draw_info.pTriangles[i]->vertexIndices[2]]) * scale);//+ position;
-
-				Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
-				triangle->Owner = "Warrior";
-				//PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(glm::vec3(0), triangle);
-				playerObject->triangles.push_back(triangle);
-				//trianglePhysObj->SetMass(-1.f);
-			}
-
-			for (cMeshObject* obj : g_pMeshObjects)
-			{
-				if (obj->meshName == "Warrior" || obj->meshName == "ISO_Sphere_1" || obj->meshName == "ISO_Sphere_2")
-				{
-					continue;
-				}
-				pVAOManager->createPhysicsObject(obj->meshName, obj->position, obj->scale);
-			}
-			int quarter = (int)(playerObject->triangles.size() / 2) / 2;
-			int half = (int)(playerObject->triangles.size() / 2);
-			std::thread th([&]() {
-				while (!endThread) {
-					m_PhysicsSystem.UpdateStep(0, playerObject->triangles.size());
-				}
-				});
-			th.detach();
-			Loaded = true;
+	
 		}
 	}
 	if (key == GLFW_KEY_C && action == GLFW_PRESS)

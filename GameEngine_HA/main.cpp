@@ -423,7 +423,9 @@ int main(int argc, char* argv[])
 	// Need this for lighting
 	GLint mModelInverseTransform_location = glGetUniformLocation(shaderID, "mModelInverseTranspose");
 
-	bool spawnedThreads = false;
+	// Initialize physics system
+	pVAOManager->Load();
+	m_PhysicsSystem.Initialize();
 	float deltaTime = std::clock();
 	float duration = 0;
 	while (!glfwWindowShouldClose(window))
@@ -436,44 +438,12 @@ int main(int argc, char* argv[])
 		g_cameraTarget = g_pMeshObjects[2]->position + glm::vec3(0, 0, 0);
 		if (Loaded)
 		{
-		
-			if (!spawnedThreads)
-			{
-				spawnedThreads = true;
-
-		
-	/*			std::thread th2([&]() {
-					while (!endThread) {
-						m_PhysicsSystem.UpdateStep(quarter, half);
-					}
-					});
-				std::thread th3([&]() {
-					while (!endThread) {
-						m_PhysicsSystem.UpdateStep(half, half + quarter);
-					}
-					});
-				std::thread th4([&]() {
-					while (!endThread) {
-						m_PhysicsSystem.UpdateStep(half + quarter, playerObject->triangles.size());
-					}
-					});*/
-			}
-			//m_PhysicsSystem.playerObjects[0]->Integrate(5.f);
-			// Make sphere position = position of character model
 			g_pMeshObjects[2]->position = playerObject->position;
-			//m_PhysicsSystem.m_PhysicsObjects[0]->position = g_pMeshObjects[2]->position;
-			iShape* shapeA, * shapeB;
-
-			bool collision;
-			Loaded = true;
-
-			// Run physics updates
 			duration = (std::clock() - deltaTime) / (double)CLOCKS_PER_SEC;
 			if (duration > 0)
 			{
 				playerObject->Integrate(1.f);
 				deltaTime = std::clock();
-				// Detect collisions
 			}
 		}
 

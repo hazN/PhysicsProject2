@@ -29,7 +29,7 @@ public:
 	bool LoadModelIntoVAO(std::string fileName,
 		sModelDrawInfo& drawInfo,
 		unsigned int shaderProgramID);
-
+	void Load();
 	// We don't want to return an int, likely
 	bool FindDrawInfoByModelName(std::string filename,
 		sModelDrawInfo& drawInfo);

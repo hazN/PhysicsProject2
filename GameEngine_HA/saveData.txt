@@ -16,7 +16,7 @@ HelmsDeep HelmsDeep 84 -76 128.6 0 0 0 0.3 0 0 0 0 0 1 0 1
 o
 Ground Ground -110.4 -160 162 0 0 0 3 0 0 0 0 0 1 0 1
 o
-Warrior Warrior 30 -140 200 0 0 0 1 1 0 0 0 0 1 0 1
+Warrior Warrior 30 -140 200 0 0 0 1 0 0 0 0 0 1 0 1
 o
 Tree Tree1 -28 -59 31 0 0 0 3 0 0 0 0 0 1 0 1
 o
