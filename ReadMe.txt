@@ -2,25 +2,12 @@ Graphics Project 1
 Hassan Assaf
 Due Nov. 4th
 
-CTRL + S = SAVE
-CTRL + L = LOAD
+Build and run as expected;
 
-C = CAMERA MODE
-M = MODEL MODE
-L = LIGHT MODE
-
-PG UP/DOWN -> CYCLE THROUGH MODELS/LIGHTS
-
-Camera -> WASD MOVEMENT
-
-Model:
 WASD -> BASIC MOVEMENT
 QE -> UP DOWN
 ZX, VB, FG -> ROTATION
 CAPS LOCK -> MESH ON/OFF
 
-Lights:
-WASD -> BASIC MOVEMENT
-QE -> UP DOWN
-1,2 -> Attenuation
-3,4 -> Quadratic
+PG UP/DOWN -> CYCLE THROUGH MODELS/LIGHTS
+
