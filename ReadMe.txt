@@ -1,6 +1,6 @@
-Graphics Project 1 
+Physics Project 2 
 Hassan Assaf
-Due Nov. 4th
+Due Nov. 20th
 
 Build and run as expected;
 
